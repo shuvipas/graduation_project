@@ -1,4 +1,3 @@
-//https://electronoobs.com/eng_arduino_tut119.php
 
 
 #include <Wire.h>             //wire library
