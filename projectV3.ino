@@ -1,3 +1,6 @@
+//code to check dac and arduino
+
+
 #include <Wire.h>             //wire library
 #include <Adafruit_MCP4725.h> // MCP4725 library from adafruit
 #define analogVin A0          // Analog voltage input to A0
