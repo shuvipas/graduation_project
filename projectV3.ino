@@ -29,21 +29,21 @@ void loop(void) {
       
       
       Serial.print("Expected Voltage: ");
-      Serial.print(MCP4725_expected_output,3);
+      Serial.print(MCP4725_expected_output,6);
       
         
       Serial.print("\t DAC Voltage from the ADC: ");      
-      Serial.println(voltageRead,3);
+      Serial.println(voltageRead,6);
 
-      diff = voltageRead - MCP4725_expected_output;
-      if(diff >0){
-      Serial.print("the diffrence is: ");
-      diff = voltageRead - MCP4725_expected_output;
-      Serial.println(abs(diff));
+      diff = abs(voltageRead - MCP4725_expected_output);
+      if(diff >0.000000){
+        Serial.print("the diffrence is: ");
+        Serial.println(diff,6);
       }
       else{
         Serial.println("there is no diffrence");
-        }
+      }
+        
       Serial.println();
       delay(500);
       MCP4725_value = MCP4725_value + 250;
