@@ -11,5 +11,9 @@ if __name__ == '__main__':
     print("V in to arduino: %f", vin)
     time.sleep(2) #stopes the nrunning progrram 2 sec
     vout = float(serial.readline())
-    print("V out from arduino: %f", vout)
+    if vout == 3.25:
+        print("success")
+    else:
+        print("failure")
+        print("V out from arduino: %f", vout)
    
