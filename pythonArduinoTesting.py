@@ -5,7 +5,7 @@ import time
 if __name__ == '__main__':
     
     
-    vin = float(input('Enter expected MCP4725 voltege:').strip())
+    vin = 2.25 # float(input('Enter expected MCP4725 voltege:').strip())
     arduino = serial.Serial(port = 'COM3',baudrate=115200, timeout=0)
     serial.write(str(vin))
     print("V in to arduino: %f", vin)
