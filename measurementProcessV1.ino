@@ -1,3 +1,6 @@
+// in the terminal the seting has to be in "no line ending" 
+//(else there is garbege value 0 tothe arduino). 
+
 #include <Wire.h>             //wire library
 #include <Adafruit_MCP4725.h> // MCP4725 library from adafruit
 #define analogVin A0          // Analog voltage input to A0
@@ -21,24 +24,38 @@ int measurement_times = 5;
 void setup(void) {
   Serial.begin(9600);
   MCP4725.begin(0x60); // Default I2C Address of MCP4725 
-  Serial.println("Generating different currents:");
+  Serial.println("---Generating different currents---");
   
 }
 
 void loop(void) {
+    Serial.flush();
     Serial.println("Write float voltege for the circuit:");
     while (Serial.available() == 0) {}
     voltege_in = Serial.parseFloat();
+    
+    Serial.print("v in = ");
+    Serial.println(voltege_in);
+    Serial.println();
     MCP4725_value = MCP4725_res*(voltege_in/vcc);        
     MCP4725.setVoltage(MCP4725_value, false);  //setVoltage(value, storeflag(saves val for later use))       
     
     Serial.println("Write integer value of the resistor: ");//for R = 10k >> write 10
+    Serial.flush();
     while (Serial.available() == 0) {}
-    resistor = Serial.parseInt()
+    resistor = Serial.parseInt();
+    
     
     Serial.println("Write integer scale value of the resistor: "); //for K write 3
+    Serial.flush();
     while (Serial.available() == 0){}
     res_scale = Serial.parseInt();
+    
+    Serial.print("R = ");
+    Serial.print(resistor);
+    Serial.print("*10^");
+    Serial.print(res_scale);
+    Serial.println();
     
     current = voltege_in/resistor;
     cur_scale = 1/res_scale;
@@ -58,11 +75,11 @@ void loop(void) {
         vol_mean += voltageRead;
         Serial.print(i);
         Serial.print(") The voltege read from the DUT: "); // DUT device under test
-        Serial.print(voltegeRead);
+        Serial.print(voltageRead);
         Serial.println();
         
         
-        dealy(2000);// 2 sec wait
+        delay(2000);// 2 sec wait
     }
     vol_mean = vol_mean/measurement_times;
     Serial.print("The mean voltege read from the DUT: ");
