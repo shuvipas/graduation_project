@@ -84,5 +84,5 @@ void loop(void) {
     vol_mean = vol_mean/measurement_times;
     Serial.print("The mean voltege read from the DUT: ");
     Serial.println(vol_mean);
-    Serial.print("\n\n\n");
+    Serial.print("\n-------------\n");
 }
