@@ -18,33 +18,37 @@ float current =0;
 float vol_mean =0;
 int measurement_times = 5;
 
-void setup(void) 
-{
+void setup(void) {
   Serial.begin(9600);
   MCP4725.begin(0x60); // Default I2C Address of MCP4725 
   Serial.println("Generating different currents:");
+  
 }
 
-void loop(void) 
-{
-    Serial.print("Write float voltege for the circuit:\n")
+void loop(void) {
+    Serial.println("Write float voltege for the circuit:");
     while (Serial.available() == 0) {}
     voltege_in = Serial.parseFloat();
     MCP4725_value = MCP4725_res*(voltege_in/vcc);        
     MCP4725.setVoltage(MCP4725_value, false);  //setVoltage(value, storeflag(saves val for later use))       
     
-    Serial.print("Write integer value of the resistor: \n")//for R = 10k >> write 10
+    Serial.println("Write integer value of the resistor: ");//for R = 10k >> write 10
     while (Serial.available() == 0) {}
     resistor = Serial.parseInt()
     
-    Serial.print("Write integer scale value of the resistor: \n") //for K write 3
+    Serial.println("Write integer scale value of the resistor: "); //for K write 3
     while (Serial.available() == 0){}
     res_scale = Serial.parseInt();
     
     current = voltege_in/resistor;
     cur_scale = 1/res_scale;
         
-    Serial.print("expected current: %d*10^%d [A]\n",current, cur_scale);
+    Serial.print("expected current: ");//%d*10^%d [A]\n",current, cur_scale);
+    Serial.print(current);
+    Serial.print("*10^");
+    Serial.print(cur_scale);
+    Serial.println();
+
     // delay(2000);// 2 sec. we dont need because were waiting for user input.
 
     for(int i=0; i<measurement_times;i++)
@@ -52,10 +56,16 @@ void loop(void)
         adcValueRead = analogRead(analogVin);
         voltageRead = (adcValueRead * vcc)/ ADC_res;
         vol_mean += voltageRead;
-        Serial.print("%d) The voltege read from the DUT: %f\n",i, voltegeRead); // DUT device under test
+        Serial.print(i);
+        Serial.print(") The voltege read from the DUT: "); // DUT device under test
+        Serial.print(voltegeRead);
+        Serial.println();
+        
+        
         dealy(2000);// 2 sec wait
     }
     vol_mean = vol_mean/measurement_times;
-    Serial.print("The mean voltege read from the DUT: %f\n", vol_mean); // DUT device under test
+    Serial.print("The mean voltege read from the DUT: ");
+    Serial.println(vol_mean);
     Serial.print("\n\n\n");
 }
