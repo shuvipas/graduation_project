@@ -22,9 +22,9 @@ def set_voltage(ser, v_in):
 
 
 def get_voltage(ser):
-    v_out = int(ser.readline().rstrip().decode())
-    return v_out
-
+   v_adc = int(ser.readline().rstrip().decode())
+   v_out = (v_adc * 5) / 1023
+   return v_out
 
 if __name__ == '__main__':
 
@@ -33,6 +33,10 @@ if __name__ == '__main__':
 
     set_voltage(arduino, '0012')  # We need to send a string with length of 4, because the Arduino expect receiving 4
     # bytes.
-    time.sleep(0.1)
-    data = get_voltage(arduino)
-    print(data)
+        data = list()
+    run = 1
+    while run:
+        #time.sleep(0.1)
+    
+        data.append(get_voltage(arduino))
+        print(data)
