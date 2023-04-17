@@ -1,13 +1,14 @@
+int data;
+
 void setup() {
-  // put your setup code here, to run once:
-      Serial.begin(9600);
+  Serial.begin(9600);
+  Serial.setTimeout(1);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-    if(!Serial.available() == 0) {
-      float data = float(Serial.read());
-      data = data +1;
-      Serial.print(char(data));
-    } 
+  while(Serial.available() <= 4){
+  }
+   data = Serial.readString().toInt();
+   int sum = data + 1;
+   Serial.println(sum); 
 }
