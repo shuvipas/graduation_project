@@ -7,8 +7,8 @@ const float vcc = 5.0;
 const int measurement_times = 5;
 const float DAC_res = 4096.0;
 const long reportInterval = 200; // How often to write the result to serial in milliseconds
-
-
+const int HANDSHAKE = 0;
+const int CASE_1 = 1;
 
 
 const long R2 = 100;
@@ -49,10 +49,26 @@ void setup() {
 }
 
 void loop() {
-  while(Serial.available() == 0){}
-  
-
-  double current[6] = {0.01, 0.001, 0.0001,0.00001,0.000001,0.0000001};
+ // while(Serial.available() == 0){}
+if (Serial.available() > 0) {
+  int inByte = Serial.read();
+  int test = 0;
+  switch(inByte)
+  {
+          case CASE_1: 
+            double current[6] = {0.01, 0.001, 0.0001,0.00001,0.000001,0.0000001};
+          test=1;
+            break;
+          case HANDSHAKE:
+            if (Serial.availableForWrite()) {
+                Serial.println("Message received.");
+            }
+            test=0;
+            break;
+  }
+       
+if(test)
+{
   for(int i=0; i<6; i++)
   {
     int resistor = resistor_finder(current[i]);// R = 1*10^resistor (ohm) 
@@ -73,6 +89,7 @@ void loop() {
         measurement++;
         }  
     }
- } 
-  
+  } 
+}
+} 
 }
