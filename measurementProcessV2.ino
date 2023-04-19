@@ -1,16 +1,12 @@
 #include <Adafruit_MCP4725.h> // MCP4725 library from adafruit
-#define analogVin A0          // Analog voltage input to A0
 
-Adafruit_MCP4725 MCP4725; 
-
-float vol_mean =0;
-float voltageRead = 0;
-float vcc = 5.0;
-int measurement_times = 5;
-int MCP4725_value = 0;//if it doesn't work we could try diffrent data types like 'uint32_t'
+Adafruit_MCP4725 DAC; 
+const int analogVin = A0;
+//float voltageRead = 0;
+const float vcc = 5.0;
+const int measurement_times = 5;
+const float DAC_res = 4096.0;
 const long reportInterval = 200; // How often to write the result to serial in milliseconds
-
-unsigned long timeLastWrite; // Global variable to keep track of the last writeout
 
 
 
@@ -32,55 +28,51 @@ long resistor_finder(double current)
       return R3;
     }
     else if(current< 0.001) 
-    
     {
       return R4; 
     }
     else if(current< 0.0001) 
-    
     {
       return R5; 
     }
      else if(current< 0.00001) 
-    
     {
       return R6; 
-    }
-    
+    }    
 }
+
 void setup() {
   Serial.begin(9600);
-  MCP4725.begin(0x60); // Default I2C Address of MCP4725 
+  DAC.begin(0x60); // Default I2C Address of MCP4725 
   Serial.setTimeout(1);
   
 }
 
 void loop() {
   while(Serial.available() == 0){}
-
+  
 
   double current[6] = {0.01, 0.001, 0.0001,0.00001,0.000001,0.0000001};
   for(int i=0; i<6; i++)
   {
     int resistor = resistor_finder(current[i]);// R = 1*10^resistor (ohm) 
     float v_dac = current[i]*resistor;
-    MCP4725_value = MCP4725_res*(v_dac/vcc);        
-    MCP4725.setVoltage(MCP4725_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
-    int measurement=0;
-    timeLastWrite = millis();
-    unsigned long currTime = millis(); // Grab the current time
-    while(i<measurement_times)
+    int DAC_value = DAC_res*(v_dac/vcc);  // If it doesn't work we could try diffrent data types like 'uint32_t'     
+    DAC.setVoltage(DAC_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
+    int measurement = 0;
+    unsigned long timeLastWrite = millis();
+    
+    while(measurement < measurement_times)
     {
+        unsigned long currTime = millis(); // Grab the current time
         if(currTime - timeLastWrite >= reportInterval)
         {
         timeLastWrite = currTime;
-        adcValueRead = analogRead(analogVin);
-        Serial.println(adcValueRead); 
-        measurement_times++;
+        int adcVal = analogRead(analogVin);
+        Serial.println(adcVal); 
+        measurement++;
         }  
     }
-   
-    
-  } 
+ } 
   
 }
