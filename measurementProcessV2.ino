@@ -8,6 +8,13 @@ float voltageRead = 0;
 float vcc = 5.0;
 int measurement_times = 5;
 int MCP4725_value = 0;//if it doesn't work we could try diffrent data types like 'uint32_t'
+const long reportInterval = 200; // How often to write the result to serial in milliseconds
+
+unsigned long timeLastWrite; // Global variable to keep track of the last writeout
+
+
+
+
 const long R2 = 100;
 const long R3 = 1000;
 const long R4 = 10000;
@@ -45,6 +52,7 @@ void setup() {
   Serial.begin(9600);
   MCP4725.begin(0x60); // Default I2C Address of MCP4725 
   Serial.setTimeout(1);
+  
 }
 
 void loop() {
@@ -58,16 +66,18 @@ void loop() {
     float v_dac = current[i]*resistor;
     MCP4725_value = MCP4725_res*(v_dac/vcc);        
     MCP4725.setVoltage(MCP4725_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
-    for(int i=0; i<measurement_times;i++)
+    int measurement=0;
+    timeLastWrite = millis();
+    unsigned long currTime = millis(); // Grab the current time
+    while(i<measurement_times)
     {
+        if(currTime - timeLastWrite >= reportInterval)
+        {
+        timeLastWrite = currTime;
         adcValueRead = analogRead(analogVin);
         Serial.println(adcValueRead); 
-        //voltageRead = (adcValueRead * vcc)/ resistor;
-       // vol_mean += voltageRead;
-       delay(200);// 2 sec wait
-        
-        
-        
+        measurement_times++;
+        }  
     }
    
     
