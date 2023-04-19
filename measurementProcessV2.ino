@@ -53,12 +53,14 @@ void loop() {
 if (Serial.available() > 0) {
   int inByte = Serial.read();
   int test = 0;
+  double current[6] = {0.01, 0.001, 0.0001,0.00001,0.000001,0.0000001};
+  double *currPtr;
   switch(inByte)
   {
           case CASE_1: 
-            double current[6] = {0.01, 0.001, 0.0001,0.00001,0.000001,0.0000001};
+          currPtr = &current;
           test=1;
-            break;
+          break;
           case HANDSHAKE:
             if (Serial.availableForWrite()) {
                 Serial.println("Message received.");
@@ -71,8 +73,8 @@ if(test)
 {
   for(int i=0; i<6; i++)
   {
-    int resistor = resistor_finder(current[i]);// R = 1*10^resistor (ohm) 
-    float v_dac = current[i]*resistor;
+    int resistor = resistor_finder(currPtr[i]);// R = 1*10^resistor (ohm) 
+    float v_dac = currPtr[i]*resistor;
     int DAC_value = DAC_res*(v_dac/vcc);  // If it doesn't work we could try diffrent data types like 'uint32_t'     
     DAC.setVoltage(DAC_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
     int measurement = 0;
