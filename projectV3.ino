@@ -1,4 +1,4 @@
-//code to check dac and arduino
+//https://electronoobs.com/eng_arduino_tut119.php
 
 
 #include <Wire.h>             //wire library
@@ -46,7 +46,7 @@ void loop(void) {
       else{
         Serial.println("there is no diffrence");
       }
-        
+             
       Serial.println();
       delay(500);
       MCP4725_value = MCP4725_value + 250;
