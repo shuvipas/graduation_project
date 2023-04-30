@@ -38,49 +38,50 @@ if (Serial.available() > 0) {
   int test = 0;
   if(inByte ==1) {test=1;}
   else if (inByte ==0 &&Serial.availableForWrite())
-  {Serial.println("Message received.");
+  {
+    Serial.println("Message received.");
     test=0;
   }
   
-if(test)
-{
-  for(int i=R2; i<=R6; i++)
+  if(test)
   {
-    
-    digitalWrite(R2, OFF);
-    digitalWrite(R3, OFF);
-    digitalWrite(R4, OFF);
-    digitalWrite(R5, OFF);
-    digitalWrite(R6, OFF);
-
-    digitalWrite(i, ON);// turn on the specific ressitor
-    
-    
-    int DAC_value = 0;  // If it doesn't work we could try diffrent data types like 'uint32_t'     
-    while(DAC_value<DAC_res)
-    {  
-    
-    DAC.setVoltage(DAC_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
-    int measurement = 0;
-    unsigned long timeLastWrite = millis();
-    
-    while(measurement < measurement_times)
+    for(int i=R2; i<=R6; i++)
     {
-        unsigned long currTime = millis(); // Grab the current time
-        if(currTime - timeLastWrite >= reportInterval)
-        {
-        timeLastWrite = currTime;
-        int adcVal = analogRead(analogVin);
-        Serial.println(i); // what resistor is turned on R = 10^i
-        Serial.println(DAC_value); // the dac val 
-        Serial.println(adcVal); 
-        measurement++;
-        }  
+
+      digitalWrite(R2, OFF);
+      digitalWrite(R3, OFF);
+      digitalWrite(R4, OFF);
+      digitalWrite(R5, OFF);
+      digitalWrite(R6, OFF);
+
+      digitalWrite(i, ON);// turn on the specific ressitor
+
+
+      int DAC_value = 0;  // If it doesn't work we could try diffrent data types like 'uint32_t'     
+      while(DAC_value<DAC_res)
+      {  
+
+      DAC.setVoltage(DAC_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
+      int measurement = 0;
+      unsigned long timeLastWrite = millis();
+
+      while(measurement < measurement_times)
+      {
+          unsigned long currTime = millis(); // Grab the current time
+          if(currTime - timeLastWrite >= reportInterval)
+          {
+            timeLastWrite = currTime;
+            int adcVal = analogRead(analogVin);
+            Serial.println(i); // what resistor is turned on R = 10^i
+            Serial.println(DAC_value); // the dac val 
+            Serial.println(adcVal); 
+            measurement++;
+          }  
+      }
+      DAC_value += 200;
+      } 
     }
-    DAC_value += 100;
-    } 
-  }
-  Serial.println("Done");
-} 
-}
-}
+    Serial.println("Done");
+  } //if(test)
+}//if (Serial.available() > 0)
+}//void loop
