@@ -50,6 +50,11 @@ if __name__ == '__main__':
     port = 'COM3'
     arduino = serial_connect(port)
     data = list()  #(current, voltage)
+    hand_shake_str = '0\n'
+    ser.write(hand_shake_str.encode())
+    print(ser.readline().rstrip().decode())
+    start_str = '1\n'
+    ser.write(start_str.encode())
     while True:
         res = get_resistor(arduino) 
         if(res =="Done"):
