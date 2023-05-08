@@ -51,10 +51,10 @@ if __name__ == '__main__':
     arduino = serial_connect(port)
     data = list()  #(current, voltage)
     hand_shake_str = '0\n'
-    ser.write(hand_shake_str.encode())
+    ser.write(hand_shake_str.encode()) #ser.write(bytes([0]))
     print(ser.readline().rstrip().decode())
     start_str = '1\n'
-    ser.write(start_str.encode())
+    ser.write(start_str.encode()) #ser.write(bytes([1]))
     while True:
         res = get_resistor(arduino) 
         if(res =="Done"):
