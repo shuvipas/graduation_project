@@ -20,18 +20,18 @@ def serial_connect(port_name):
 
 
 def get_adc_voltage(ser):
-   adc_num = int(ser.readline().rstrip().decode())
+   adc_num = int(ser.read_until().rstrip().decode())
    v_adc = (adc_num * VCC) / ADC_RESALUTION
    return v_adc
 
 def get_dac_voltage(ser):
-   dac_num = int(ser.readline().rstrip().decode())
+   dac_num = int(ser.read_until().rstrip().decode())
    v_dac = (dac_num * VCC) / DAC_RESALUTION
    return v_dac
 
 
 def get_resistor(ser):
-    res = ser.readline().rstrip().decode()
+    res = ser.read_until().rstrip().decode()
     if(str(res) =="Done"):
         return  str(res)
     res = 10^int(res)
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     _ = arduino.read_all()##
     hand_shake_str = '0\n'
     arduino.write(hand_shake_str.encode()) #ser.write(bytes([0]))
-    print(arduino.readline().rstrip().decode())
+    print(arduino.read_until().decode()) #print(arduino.readline().rstrip().decode())
     start_str = '1\n'
     arduino.write(start_str.encode()) #ser.write(bytes([1]))
     
@@ -70,6 +70,7 @@ if __name__ == '__main__':
         
         data.append((current, v_adc))
     
+    arduino.close()
     print(data)
     graph_ploter(data)
     
