@@ -78,6 +78,9 @@ if (Serial.available() > 0) {
             measurement++;
           }  
       }
+        
+        // add here a if the vin+vdut= 18v then break
+        // and the v_dut can be the mean 
       DAC_value += 200;
       } 
     }
