@@ -1,6 +1,7 @@
 import serial
 import time
 import matplotlib.pyplot as plt
+import openpyxl
 
 #DAC_RESOLUTION = 4096
 ADC_RESOLUTION = 1023
@@ -82,7 +83,15 @@ def graph_plot(data):
     plt.title('V/I Curve')
     plt.show()
 
+def convert_list_to_excel(data_list, headline, file_name):
+    workbook = openpyxl.Workbook()
+    sheet = workbook.active
+    sheet.append(headline)
+    for row_data in data_list:
+        sheet.append(row_data)
 
+    workbook.save(file_name)
+    
 if __name__ == '__main__':
 
     port = 'COM3'
@@ -100,7 +109,8 @@ if __name__ == '__main__':
     _ = arduino.read_all()  #
 
     arduino.write(bytes([START]))
-    print("(v_adc,v_dac, current)")
+    headline = ("v_adc", "v_dac", "current")
+    print(headline)
     data = list()  # (voltage, current)
     while True:
         res = get_resistor(arduino)
@@ -112,8 +122,9 @@ if __name__ == '__main__':
         v_adc = get_adc_voltage(arduino) * ((68 + 47) / 47)
 
         data.append((v_adc, v_dac, current))
-
+    
     arduino.close()
-   # for i in data:
-   #     print(i)
+    # for i in data:
+    #     print(i)
+    convert_list_to_excel(data, headline, file_name):
     graph_plot(data)
