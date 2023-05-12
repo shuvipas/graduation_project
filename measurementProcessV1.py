@@ -119,12 +119,13 @@ if __name__ == '__main__':
 
         v_dac = get_adc_voltage(arduino)
         current = v_dac / res
-        v_adc = get_adc_voltage(arduino) * ((68 + 47) / 47)
+        v_adc = get_adc_voltage(arduino) * ((68 + 47) / 47) #multiplied with the Voltage Divider of the  Instrumentation Amplifier
 
         data.append((v_adc, v_dac, current))
     
     arduino.close()
     # for i in data:
     #     print(i)
-    convert_list_to_excel(data, headline, file_name):
+    file_name = #insert name 
+    convert_list_to_excel(data, headline, file_name)
     graph_plot(data)
