@@ -1,54 +1,96 @@
-//https://electronoobs.com/eng_arduino_tut119.php
-
-
-#include <Wire.h>             //wire library
 #include <Adafruit_MCP4725.h> // MCP4725 library from adafruit
-#define analogVin A0          // Analog voltage input to A0
+#define ON HIGH
+#define OFF LOW
 
-Adafruit_MCP4725 MCP4725; 
+Adafruit_MCP4725 DAC; 
+const int analogVin = A0;
+const int DacMeasurement = A1;
+const int measurement_times = 2;
+const int DAC_res = 4096;
+const long reportInterval = 200; // How often to write the result to serial in milliseconds
 
-int MCP4725_value = 0;//if it doesn't work we could try diffrent data types like 'uint32_t'
-int adcValueRead = 0;
-float voltageRead = 0;
-float MCP4725_expected_output;
-float diff;
+const int HANDSHAKE = 0;
+const int CASE_1 = 1;
 
-    
-void setup(void) {
-  Serial.begin(9600);
-  MCP4725.begin(0x60); // Default I2C Address of MCP4725 
-  Serial.println("Generating different voltages:");
+//depends on the digital pins but the values must be continues 
+const int R2 = 2;// 100 ohm
+const int R3 = 3; // 1 K*ohm
+const int R4 = 4; // 10 K*ohm
+const int R5 = 5; // 100 K*ohm
+const int R6 = 6; // 1 M*ohm
+
+
+void setup() {
+  Serial.begin(115200);
+  DAC.begin(0x60); // Default I2C Address of MCP4725 
+  Serial.setTimeout(1);
+  pinMode(R4, OUTPUT);
   
+  /*
+  pinMode(R2, OUTPUT);
+  pinMode(R3, OUTPUT);
+  pinMode(R5, OUTPUT);
+  pinMode(R6, OUTPUT);
+  */
 }
 
-void loop(void) {
-    
-    if(MCP4725_value < 4096){
-      MCP4725_expected_output = (5.0/4096.0) * MCP4725_value;
-      MCP4725.setVoltage(MCP4725_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
-      delay(500);
-      adcValueRead = analogRead(analogVin);
-      voltageRead = (adcValueRead * 5.0 )/ 1024.0;
+void loop() {
+if (Serial.available() > 0) {
+  int inByte = Serial.read();
+  int test = 0;
+  if(inByte == CASE_1) {test = 1;}
+  else if (inByte == HANDSHAKE)
+     { 
+      if (Serial.availableForWrite())
+        {
+    Serial.println("Message received.");
+        }
+    test = 0;
+  }
+  
+  if(test)
+  {
+    /*
+    for(int i = R1; i <= R5; i++)
+    {
       
-      
-      Serial.print("Expected Voltage: ");
-      Serial.print(MCP4725_expected_output,6);
-      
-        
-      Serial.print("\t DAC Voltage from the ADC: ");      
-      Serial.println(voltageRead,6);
+      digitalWrite(R1, OFF);
+      digitalWrite(R2, OFF);
+      digitalWrite(R3, OFF);
+      digitalWrite(R4, OFF);
+      digitalWrite(R5, OFF);
 
-      diff = abs(voltageRead - MCP4725_expected_output);
-      if(diff >0.000000){
-        Serial.print("the diffrence is: ");
-        Serial.println(diff,6);
+      digitalWrite(i, ON);// turn on the specific resistor
+      */
+      digitalWrite(R4, ON);
+      int DAC_value[20] = {200, 400, 600, 800, 1000, 
+                           1200, 1400, 1600, 1800, 2000,
+                           2200, 2400, 2600, 2800, 3000,
+                           3200, 3400, 3600, 3800, 4000};  // If it doesn't work we could try diffrent data types like 'uint32_t'     
+      for(int j = 0; j < 20; j++)
+      {  
+
+      DAC.setVoltage(DAC_value[j], false);  //setVoltage(value, storeflag(saves val for later use)) 
+      int measurement = 0;
+      unsigned long timeLastWrite = millis();
+
+      while(measurement < measurement_times)
+      {
+          unsigned long currTime = millis(); // Grab the current time
+          if(currTime - timeLastWrite >= reportInterval)
+          {
+            timeLastWrite = currTime;
+            int adcVal = analogRead(analogVin);
+            int dacVal = analogRead(DacMeasurement);
+            Serial.println(R4);//i); // what resistor is turned on R = 10^i
+            Serial.println(dacVal);//DAC_value[j]); // the dac val 
+            Serial.println(adcVal); 
+            measurement++;
+          }  
       }
-      else{
-        Serial.println("there is no diffrence");
-      }
-             
-      Serial.println();
-      delay(500);
-      MCP4725_value = MCP4725_value + 250;
-      }
-}
+     } 
+   // }//for(Res)
+    Serial.println("Done");
+  } //if(test)
+ }//if (Serial.available() > 0)
+}//void loop
