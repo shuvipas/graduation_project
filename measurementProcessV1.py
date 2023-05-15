@@ -109,7 +109,7 @@ if __name__ == '__main__':
     _ = arduino.read_all()  #
 
     arduino.write(bytes([START]))
-    headline = ("v_adc", "v_dac", "current")
+    headline = ("v_adc", "v_dac", "current", "dut_res")
     print(headline)
     data = list()  # (voltage, current)
     while True:
@@ -119,9 +119,10 @@ if __name__ == '__main__':
 
         v_dac = get_adc_voltage(arduino)
         current = v_dac / res
+        dut_res = v_dac/current
         v_adc = get_adc_voltage(arduino) * ((68 + 47) / 47) #multiplied with the Voltage Divider of the  Instrumentation Amplifier
 
-        data.append((v_adc, v_dac, current))
+        data.append((v_adc, v_dac, current,dut_res))
     
     arduino.close()
     # for i in data:
