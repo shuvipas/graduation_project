@@ -24,14 +24,13 @@ void setup() {
   Serial.begin(115200);
   DAC.begin(0x60); // Default I2C Address of MCP4725 
   Serial.setTimeout(1);
-  pinMode(R4, OUTPUT);
-  
-  /*
+    
   pinMode(R2, OUTPUT);
   pinMode(R3, OUTPUT);
+  pinMode(R4, OUTPUT);
   pinMode(R5, OUTPUT);
   pinMode(R6, OUTPUT);
-  */
+  
 }
 
 void loop() {
@@ -50,7 +49,7 @@ if (Serial.available() > 0) {
   
   if(test)
   {
-    /*
+    
     for(int i = R1; i <= R5; i++)
     {
       
@@ -61,8 +60,7 @@ if (Serial.available() > 0) {
       digitalWrite(R5, OFF);
 
       digitalWrite(i, ON);// turn on the specific resistor
-      */
-      digitalWrite(R4, ON);
+      
       int DAC_value[20] = {200, 400, 600, 800, 1000, 
                            1200, 1400, 1600, 1800, 2000,
                            2200, 2400, 2600, 2800, 3000,
@@ -82,14 +80,14 @@ if (Serial.available() > 0) {
             timeLastWrite = currTime;
             int adcVal = analogRead(analogVin);
             int dacVal = analogRead(DacMeasurement);
-            Serial.println(R4);//i); // what resistor is turned on R = 10^i
-            Serial.println(dacVal);//DAC_value[j]); // the dac val 
+            Serial.println(i); // what resistor is turned on R = 10^i
+            Serial.println(dacVal); // the dac val 
             Serial.println(adcVal); 
             measurement++;
           }  
       }
      } 
-   // }//for(Res)
+    }//for(Res)
     Serial.println("Done");
   } //if(test)
  }//if (Serial.available() > 0)
