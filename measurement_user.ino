@@ -1,6 +1,7 @@
 #include <Adafruit_MCP4725.h> // MCP4725 library from adafruit
 #define ON HIGH
 #define OFF LOW
+#define DONE = "done" 
 
 Adafruit_MCP4725 DAC;
 const int InAmpVout = A0;
@@ -20,7 +21,6 @@ const int R4 = 4; // 10 K*ohm
 const int R5 = 5; // 100 K*ohm
 const int R6 = 6; // 1 M*ohm
 
-const char* DONE = "done";
 
 void setup() {
     Serial.begin(115200);
