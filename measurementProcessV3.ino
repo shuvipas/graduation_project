@@ -3,8 +3,8 @@
 #define OFF LOW
 
 Adafruit_MCP4725 DAC; 
-const int analogVin = A0;
-const int DacMeasurement = A1;
+const int InAmpVout = A0;
+const int DacVout = A1;
 const int measurement_times = 2;
 const int DAC_res = 4096;
 const long reportInterval = 200; // How often to write the result to serial in milliseconds
@@ -23,14 +23,12 @@ const int R6 = 6; // 1 M*ohm
 void setup() {
   Serial.begin(115200);
   DAC.begin(0x60); // Default I2C Address of MCP4725 
-  Serial.setTimeout(1);
-    
+  Serial.setTimeout(2);
   pinMode(R2, OUTPUT);
   pinMode(R3, OUTPUT);
   pinMode(R4, OUTPUT);
   pinMode(R5, OUTPUT);
   pinMode(R6, OUTPUT);
-  
 }
 
 void loop() {
@@ -49,18 +47,17 @@ if (Serial.available() > 0) {
   
   if(test)
   {
-    
-    for(int i = R1; i <= R5; i++)
-    {
-      
-      digitalWrite(R1, OFF);
+  
+    for(int i = R2; i <= R6; i++){
+      //int i = 4;
       digitalWrite(R2, OFF);
       digitalWrite(R3, OFF);
       digitalWrite(R4, OFF);
       digitalWrite(R5, OFF);
-
-      digitalWrite(i, ON);// turn on the specific resistor
+      digitalWrite(R6, OFF);
       
+      digitalWrite(i, ON);// turn on the specific resistor
+    //  digitalWrite(R4, ON);
       int DAC_value[20] = {200, 400, 600, 800, 1000, 
                            1200, 1400, 1600, 1800, 2000,
                            2200, 2400, 2600, 2800, 3000,
@@ -78,16 +75,16 @@ if (Serial.available() > 0) {
           if(currTime - timeLastWrite >= reportInterval)
           {
             timeLastWrite = currTime;
-            int adcVal = analogRead(analogVin);
-            int dacVal = analogRead(DacMeasurement);
+            int adcVal = analogRead(InAmpVout);
+            int dacVal = analogRead(DacVout);
             Serial.println(i); // what resistor is turned on R = 10^i
             Serial.println(dacVal); // the dac val 
             Serial.println(adcVal); 
             measurement++;
           }  
       }
-     } 
-    }//for(Res)
+     } //for(DAC_value) 
+   } //for(R)
     Serial.println("Done");
   } //if(test)
  }//if (Serial.available() > 0)
