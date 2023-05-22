@@ -12,7 +12,7 @@ const int VCC = 5;
 
 const int HANDSHAKE = 0;
 const int SWEEP = 1;
-const int USER_COMMAEND  = 2;
+const int USER_COMMAND  = 2;
 
 //depends on the digital pins but the values must be continues 
 const int R2 = 2;// 100 ohm
@@ -39,32 +39,32 @@ void loop() {
 if (Serial.available() > 0) {
   int inByte = Serial.read();
   //int test = 0;
-  if(inByte == SWEEP) {test = 1;}
+  //if(inByte == SWEEP) {test = 1;}
   if (inByte == HANDSHAKE)
      { 
       if (Serial.availableForWrite())
         {
-			Serial.println("Message received.");
+		Serial.println("Message received.");
         }
-    test = 0;
+   // test = 0;
   }
-  else if(inByte == USER_COMMAEND)
+  else if(inByte == USER_COMMAND)
   {
 	  
-	  digitalWrite(R1, OFF);
+      digitalWrite(R1, OFF);
       digitalWrite(R2, OFF);
       digitalWrite(R3, OFF);
       digitalWrite(R4, OFF);
       digitalWrite(R5, OFF);
 	
-	  while(true){
+      while(true){
 	  int res = Serial.read();
 	  if(res == 0){break;}//if res = 0 end USER_COMMAEND ask in python what to do (will get into inByte)
 	  digitalWrite(res, ON);// turn on the specific resistor
-	  float user_volt= Serial.read(); // can be int 
-	  int DAC_value = DAC_RES*(user_volt/VCC);
+	  int DAC_value = Serial.read(); // can be int 
+	  //int DAC_value = DAC_RES*(user_volt/VCC); // in the python
 	  DAC.setVoltage(DAC_value, false);  //setVoltage(value, storeflag(saves val for later use)) 
-      unsigned long timeLastWrite = millis();
+          unsigned long timeLastWrite = millis();
 
       while(Serial.available() == 0) // i need to check if this will work
       {
