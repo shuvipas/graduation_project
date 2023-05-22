@@ -1,7 +1,7 @@
 #include <Adafruit_MCP4725.h> // MCP4725 library from adafruit
 #define ON HIGH
 #define OFF LOW
-#define DONE = "done" 
+#define DONE "done" 
 
 Adafruit_MCP4725 DAC;
 const int InAmpVout = A0;
@@ -54,7 +54,7 @@ void loop() {
 
             for (int i = 0; i < readNum; i++)
             {
-                DAC_value = dacInput + i * readDiff;
+                int DAC_value = dacInput + i * readDiff;
                 DAC.setVoltage(DAC_value, false);  //setVoltage(value, storeflag(saves val for later use))
                 int measurement = 0;
                 unsigned long timeLastWrite = millis();
