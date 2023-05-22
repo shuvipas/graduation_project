@@ -3,10 +3,13 @@ import time
 import matplotlib.pyplot as plt
 import openpyxl
 
-#DAC_RESOLUTION = 4096
+# DAC_RESOLUTION = 4096
 ADC_RESOLUTION = 1023
+MEASUREMENT_TIMES = 2
 VCC = 5.0
+V_SUPPLY = 18
 START = 1
+
 
 def serial_connect(port_name):
     try:
@@ -58,22 +61,33 @@ def get_adc_voltage(ser):
 
 def get_dac_voltage(ser):
     dac_num = int(ser.read_until().rstrip().decode())
-    v_dac = (dac_num * VCC) / ADC_RESOLUTION # DAC_RESOLUTION
+    v_dac = (dac_num * VCC) / ADC_RESOLUTION  # DAC_RESOLUTION
     return v_dac
 
 
 def get_resistor(ser):
     res = ser.read_until().rstrip().decode()
-    if (str(res) == "Done"):
+    if str(res) == "Done":
         return str(res)
     res = 10 ** int(res)
     return res
 
 
-def graph_plot(data):
+def remove_data(data_list, measurement_time):
+    i = 0
+    diff_points = len(data_list) / measurement_time
+    while i < diff_points - 1:
+        diff = data_list[(i + 1) * measurement_time][0] - data_list[i * measurement_time][0]
+        if diff < VCC / ADC_RESOLUTION:
+            del data_list[(i + 1) * measurement_time:(i + 1) * measurement_time + measurement_time]
+        else:
+            i += 1
+    return data_list
 
+
+def graph_plot(data):
     # split tuples into separate lists
-    v_out, v_in, cur = zip(*data)
+    v_out, v_in, cur, r = zip(*data)
 
     # plot x against y
     plt.scatter(v_out, cur)
@@ -83,15 +97,21 @@ def graph_plot(data):
     plt.title('V/I Curve')
     plt.show()
 
-def convert_list_to_excel(data_list, headline, file_name):
+
+def convert_list_to_excel(data_list, head_line, file_name):
     workbook = openpyxl.Workbook()
     sheet = workbook.active
-    sheet.append(headline)
+    sheet.append(head_line)
     for row_data in data_list:
         sheet.append(row_data)
 
     workbook.save(file_name)
-    
+
+
+def calibration(arduino):
+    adc_num = int(arduino.read_until().rstrip().decode())
+    vcc = adc_num / ADC_RESOLUTION #* ((r2+ r1) / r1)
+
 if __name__ == '__main__':
 
     port = 'COM3'
@@ -104,14 +124,14 @@ if __name__ == '__main__':
     time.sleep(1)
     # Set a long timeout to complete handshake
     timeout = arduino.timeout
-    arduino.timeout = 1
+    arduino.timeout = 2
     # Read and discard everything that may be in the input buffer
-    _ = arduino.read_all()  #
+    _ = arduino.read_all()
 
     arduino.write(bytes([START]))
     headline = ("v_adc", "v_dac", "current", "dut_res")
-    print(headline)
     data = list()  # (voltage, current)
+
     while True:
         res = get_resistor(arduino)
         if res == "Done":
@@ -119,14 +139,19 @@ if __name__ == '__main__':
 
         v_dac = get_adc_voltage(arduino)
         current = v_dac / res
-        dut_res = v_dac/current
-        v_adc = get_adc_voltage(arduino) * ((68 + 47) / 47) #multiplied with the Voltage Divider of the  Instrumentation Amplifier
+        v_adc = get_adc_voltage(arduino) * ((47.1 + (10.015 + 6.796)) / (10.015 + 6.796))  #  multiplied with the V.D of the InAmp
 
-        data.append((v_adc, v_dac, current,dut_res))
-    
+        dut_res = 0
+        if current > 0:
+            dut_res = v_adc / current
+
+        #  if v_adc + v_dac < V_SUPPLY:
+        data.append((v_adc, v_dac, current, dut_res))
+
     arduino.close()
-    # for i in data:
-    #     print(i)
-    file_name = #insert name 
-    convert_list_to_excel(data, headline, file_name)
-    graph_plot(data)
+    for i in data:
+        print(i)
+    #file = "C:\\Users\\Meir Sokolik\\OneDrive\\Documents\\Engineering Project\\new_rs1Meg.xlsx"
+
+    #convert_list_to_excel(data, headline, file)
+#   graph_plot(data)
