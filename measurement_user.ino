@@ -1,7 +1,7 @@
 #include <Adafruit_MCP4725.h> // MCP4725 library from adafruit
 #define ON HIGH
 #define OFF LOW
-#define DONE "done" 
+#define DONE "Done" 
 
 Adafruit_MCP4725 DAC;
 const int InAmpVout = A0;
@@ -14,7 +14,6 @@ const int HANDSHAKE = 0;
 const int SWEEP = 1;
 const int USER_INPUT = 2;
 
-//depends on the digital pins but the values must be continues
 const int R2 = 2;// 100 ohm
 const int R3 = 3; // 1 K*ohm
 const int R4 = 4; // 10 K*ohm
@@ -44,18 +43,38 @@ void loop() {
                 Serial.println("Handshake received.");
             }
         }
-
+     
         else if(inByte == USER_INPUT)
-        {
+        {   
+            Serial.println(inByte);
+            while (!Serial.available()){
+            }
             int res = Serial.read();
-            digitalWrite(res, ON);
-            int dacInput = Serial.read();
+            while(!Serial.availableForWrite()){
+            }
+            Serial.println(res);
+            while (!Serial.available()){                   
+            }
+            int DacVIn = Serial.readStringUntil('\n').toInt(); //read();
+            while(!Serial.availableForWrite()){
+            }
+            Serial.println(DacVIn);
+            while (!Serial.available()){                   
+            }
             int readNum = Serial.read();
-
+            while(!Serial.availableForWrite()){
+            }
+            Serial.println(readNum);
+            digitalWrite(res, ON);
+            
             for (int i = 0; i < readNum; i++)
             {
-                int DAC_value = dacInput + i * readDiff;
-                DAC.setVoltage(DAC_value, false);  //setVoltage(value, storeflag(saves val for later use))
+              while(!Serial.availableForWrite()){
+              }
+                Serial.println(i);
+              
+                DacVIn += i * readDiff;
+                DAC.setVoltage(DacVIn, false);  //setVoltage(value, store flag(saves val for later use))
                 int measurement = 0;
                 unsigned long timeLastWrite = millis();
                 while(measurement < measurement_times)
@@ -66,33 +85,40 @@ void loop() {
                         timeLastWrite = currTime;
                         int adcVal = analogRead(InAmpVout);
                         int dacVal = analogRead(DacVout);
-                        Serial.println(i); // what resistor is turned on R = 10^i
+                        while(!Serial.availableForWrite()){
+                   }
+                        Serial.println(res); // what resistor is turned on R = 10^i
+                        while(!Serial.availableForWrite()){
+                   }
                         Serial.println(dacVal); // the dac val
+                        while(!Serial.availableForWrite()){
+                   }
                         Serial.println(adcVal);
                         measurement++;
                     }
-                } //while(measurement < measurement_times
+                } //while(measurement < measurement_times)
             } // for(readNum)
+            while(!Serial.availableForWrite()){
+                   }
             Serial.println(DONE);
         }//if(inByte == USER_INPUT)
 
         else if(inByte == SWEEP)
         {
-
             for(int i = R2; i <= R6; i++){
-                //int i = 4;
+                
                 digitalWrite(R2, OFF);
                 digitalWrite(R3, OFF);
                 digitalWrite(R4, OFF);
                 digitalWrite(R5, OFF);
                 digitalWrite(R6, OFF);
-
+              
                 digitalWrite(i, ON);// turn on the specific resistor
-                //  digitalWrite(R4, ON);
+        
                 int DAC_value[20] = {200, 400, 600, 800, 1000,
                                      1200, 1400, 1600, 1800, 2000,
                                      2200, 2400, 2600, 2800, 3000,
-                                     3200, 3400, 3600, 3800, 4000};  // If it doesn't work we could try diffrent data types like 'uint32_t'
+                                     3200, 3400, 3600, 3800, 4000};  
                 for(int j = 0; j < 20; j++)
                 {
 
