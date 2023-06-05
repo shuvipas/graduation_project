@@ -1,7 +1,7 @@
 import serial
 import time
 import struct
-import matplotlib.pyplot as plt
+#  import matplotlib.pyplot as plt
 import openpyxl
 
 # DAC_RESOLUTION = 4096
@@ -75,6 +75,7 @@ def get_dac_voltage(ser):
 
 def get_resistor(ser):
     res = ser.read_until().rstrip().decode()
+    print(res)
     if res == END_PROGRAM:
         return res
     res = 10 ** int(res)
@@ -94,7 +95,7 @@ def remove_data(data_list, measurement_time):
     return data_list
 '''
 
-
+'''
 def graph_plot(data):
     # split tuples into separate lists
     v_out, v_in, cur, r = zip(*data)
@@ -106,7 +107,7 @@ def graph_plot(data):
     plt.ylabel('cur [A]')
     plt.title('V/I Curve')
     plt.show()
-
+'''
 
 def convert_list_to_excel(data_list):
     head_line = ("v_adc", "v_dac", "current", "dut_res")
@@ -150,7 +151,8 @@ def sweep(ser):
             break
 
         v_dac = get_adc_voltage(ser)
-        current = float(v_dac) / res
+        # print(res)
+        current = v_dac / res
         v_adc = get_adc_voltage(ser) * ((R1+R2)/R2) # (47.1 + (10.015 + 6.796)) / (10.015 + 6.796))  # multiply by the V.D of the InAmp
         dut_res = 0
         if current != 0:
@@ -192,12 +194,12 @@ def user_input(case):
         val_diff = int(DAC_RESOLUTION * (max_volt - min_volt) / VCC)  # difference between min\max volt in DAC values
         read_num = int(val_diff / read_diff)
 
-    return res, min_volt, read_num, max_volt, val_diff
+    return res, min_volt, read_num
 
 
 def user_res_and_volt(ser, case):
     _ = ser.read_all()
-    res, min_volt, read_num, max_volt, val_diff = user_input(case)
+    res, min_volt, read_num = user_input(case)
 
     dac_v_in = int(DAC_RESOLUTION * (min_volt / VCC))
     ser.write(bytes([int(case)]))
