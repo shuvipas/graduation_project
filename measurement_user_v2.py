@@ -1,7 +1,6 @@
 import serial
 import time
 import struct
-#  import matplotlib.pyplot as plt
 import openpyxl
 
 # DAC_RESOLUTION = 4096
@@ -65,12 +64,6 @@ def get_adc_voltage(ser):
     return v_adc
 
 
-'''
-def get_dac_voltage(ser):
-    dac_num = int(ser.read_until().rstrip().decode())
-    v_dac = (dac_num * VCC) / DAC_RESOLUTION
-    return v_dac
-'''
 
 
 def get_resistor(ser):
@@ -82,32 +75,6 @@ def get_resistor(ser):
     return res
 
 
-'''
-def remove_data(data_list, measurement_time):
-    i = 0
-    diff_points = len(data_list) / measurement_time
-    while i < diff_points - 1:
-        diff = data_list[(i + 1) * measurement_time][0] - data_list[i * measurement_time][0]
-        if diff < VCC / ADC_RESOLUTION:
-            del data_list[(i + 1) * measurement_time:(i + 1) * measurement_time + measurement_time]
-        else:
-            i += 1
-    return data_list
-'''
-
-'''
-def graph_plot(data):
-    # split tuples into separate lists
-    v_out, v_in, cur, r = zip(*data)
-
-    # plot x against y
-    plt.scatter(v_out, cur)
-    plt.plot(v_out, cur)
-    plt.xlabel('Voltage [V]')
-    plt.ylabel('cur [A]')
-    plt.title('V/I Curve')
-    plt.show()
-'''
 
 def convert_list_to_excel(data_list):
     head_line = ("v_adc", "v_dac", "current", "dut_res")
