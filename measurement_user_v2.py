@@ -16,9 +16,10 @@ END_PROGRAM = "Done"
 R1 = 47.1
 R2 = 10.015 + 6.796
 
+
 def serial_connect(port_name):
     try:
-        ser = serial.Serial(port_name, baudrate=115200, timeout=None) #2)
+        ser = serial.Serial(port_name, baudrate=115200, timeout=None) # 2)
         print("opened port " + ser.name + '\n')
         # give arduino time to reset
         time.sleep(2)
@@ -59,10 +60,8 @@ def handshake_arduino(ser, sleep_time=1, print_handshake_message=True, handshake
 
 
 def get_adc_voltage(ser):
-    adc_num = ser.read_until().rstrip().decode()
-    if str(adc_num) == END_PROGRAM:
-        return str(adc_num)
-    v_adc = (int(adc_num) * VCC) / ADC_RESOLUTION
+    adc_num = int(ser.read_until().rstrip().decode())
+    v_adc = (adc_num * VCC) / ADC_RESOLUTION
     return v_adc
 
 
@@ -76,8 +75,8 @@ def get_dac_voltage(ser):
 
 def get_resistor(ser):
     res = ser.read_until().rstrip().decode()
-    if str(res) == END_PROGRAM:
-        return str(res)
+    if res == END_PROGRAM:
+        return res
     res = 10 ** int(res)
     return res
 
@@ -162,8 +161,9 @@ def sweep(ser):
 
     convert_list_to_excel(data)
 
+
 def user_input(case):
-    max_volt = ""
+    max_volt = 0.0
     read_num = 1
     val_diff = 0
     res = int(input("insert resistor (int between 2-6 for res = 10^i): "))
@@ -197,8 +197,6 @@ def user_input(case):
 
 def user_res_and_volt(ser, case):
     _ = ser.read_all()
-    min_volt = 0
-
     res, min_volt, read_num, max_volt, val_diff = user_input(case)
 
     dac_v_in = int(DAC_RESOLUTION * (min_volt / VCC))
@@ -209,7 +207,7 @@ def user_res_and_volt(ser, case):
     ser.write(bytes([res]))
     # print("res = ")
     # print(ser.read_until().rstrip().decode())
-    volt_start = struct.pack('<i', dac_v_in)
+    #volt_start = struct.pack('<i', dac_v_in)
 
     # time.sleep(1)
     # ser.write(volt_start)
@@ -228,11 +226,14 @@ def user_res_and_volt(ser, case):
 
     headline = ("v_adc", "v_dac", "current", "dut_res")
     print(headline)
+
     while True:
-        v_dac = get_adc_voltage(ser)
-        if v_dac == END_PROGRAM:
+        res = get_resistor(ser)
+        if res == END_PROGRAM:
             break
-        current = v_dac / res
+
+        v_dac = get_adc_voltage(ser)
+        current = float(v_dac) / res
         v_adc = get_adc_voltage(ser) * ((R1+R2)/R2) # ((47.1 + (10.015 + 6.796)) / (10.015 + 6.796))  # multiply by the V.D of the InAmp
 
         dut_res = 0
