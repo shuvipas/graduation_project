@@ -22,17 +22,17 @@ const int R6 = 6; // 1 M*ohm
 
 
 
-void measurements(int res){`
+void measurements(int res){
     int meas_num = 0;
     unsigned long time_last_write = millis();
-    while(!Serial.availableForWrite()){
-    }
+    
     while(meas_num < measurement_times){ 
         unsigned long currTime = millis(); // Grab the current time
         if(currTime - time_last_write >= reportInterval){
             time_last_write = currTime;
             int adcVal = analogRead(InAmpVout);
             int dacVal = analogRead(DacVout);
+            while(!Serial.availableForWrite()){}
             Serial.println(res); // what resistor is turned on R = 10^i
             Serial.println(dacVal); // the dac val
             Serial.println(adcVal);
@@ -52,18 +52,22 @@ void resistors_switching(int res_on){
 }
 
 void user_input(){
-    while (!Serial.available()){
-    }
+    while (!Serial.available()){}
     int res = Serial.read();
+    
     resistors_switching(res);
     //while(!Serial.availableForWrite()){}
     //Serial.println(res);
-    while (!Serial.available()){                   
-    }
-    int dac_vin = Serial.readStringUntil('\n').toInt(); //read();
+    while (Serial.available() < 4){}
+    //int dac_vin = Serial.readStringUntil('\n').toInt(); //read();
+    byte data[4];
+    Serial.readBytes(data, 4);  // Read the 4 bytes into the data array
+
+    // Convert the byte array back to an integer
+    int dac_vin = *((int*)data);
     //while(!Serial.availableForWrite()){}
     //Serial.println(DacVIn);
-
+    
     while (!Serial.available()){}
     int read_num = Serial.read();
     //while(!Serial.availableForWrite()){}
@@ -78,8 +82,7 @@ void user_input(){
         measurements(res);    
     } // for(readNum)
 
-    while(!Serial.availableForWrite()){
-    }
+    //while(!Serial.availableForWrite()){}
     Serial.println(END_PROGRAM);
 }
 
