@@ -1,6 +1,7 @@
 import serial
 import time
 import struct
+#  import matplotlib.pyplot as plt
 import openpyxl
 
 # DAC_RESOLUTION = 4096
@@ -9,7 +10,8 @@ DAC_RESOLUTION = 4096
 MEASUREMENT_TIMES = 2
 VCC = 5.0
 V_SUPPLY = 18
-START_SWEEP = 1
+SWEEP = 1
+USER_INPUT = 2
 END_PROGRAM = "Done"
 # The V.D. of the InAmp
 R1 = 47.1
@@ -64,21 +66,52 @@ def get_adc_voltage(ser):
     return v_adc
 
 
+'''
+def get_dac_voltage(ser):
+    dac_num = int(ser.read_until().rstrip().decode())
+    v_dac = (dac_num * VCC) / DAC_RESOLUTION
+    return v_dac
+'''
 
 
 def get_resistor(ser):
     res = ser.read_until().rstrip().decode()
-    print(res)
     if res == END_PROGRAM:
         return res
     res = 10 ** int(res)
     return res
 
 
+'''
+def remove_data(data_list, measurement_time):
+    i = 0
+    diff_points = len(data_list) / measurement_time
+    while i < diff_points - 1:
+        diff = data_list[(i + 1) * measurement_time][0] - data_list[i * measurement_time][0]
+        if diff < VCC / ADC_RESOLUTION:
+            del data_list[(i + 1) * measurement_time:(i + 1) * measurement_time + measurement_time]
+        else:
+            i += 1
+    return data_list
+'''
+
+'''
+def graph_plot(data):
+    # split tuples into separate lists
+    v_out, v_in, cur, r = zip(*data)
+
+    # plot x against y
+    plt.scatter(v_out, cur)
+    plt.plot(v_out, cur)
+    plt.xlabel('Voltage [V]')
+    plt.ylabel('cur [A]')
+    plt.title('V/I Curve')
+    plt.show()
+'''
 
 def convert_list_to_excel(data_list):
     head_line = ("v_adc", "v_dac", "current", "dut_res")
-    file_name = input("insert file name: ")
+    file_name = input("insert file name: ").rstrip()
     file_path = "C:\\Users\\Meir Sokolik\\OneDrive\\Documents\\Engineering Project\\" + file_name + ".xlsx"
     workbook = openpyxl.Workbook()
     sheet = workbook.active
@@ -109,7 +142,7 @@ def reconnect(ser):
 def sweep(ser):
     # reconnect(ser)
     _ = ser.read_all()
-    ser.write(bytes([START_SWEEP]))
+    ser.write(bytes([SWEEP]))
 
     data = list()
     while True:
@@ -169,18 +202,17 @@ def user_res_and_volt(ser, case):
     res, min_volt, read_num = user_input(case)
 
     dac_v_in = int(DAC_RESOLUTION * (min_volt / VCC))
-    ser.write(bytes([int(case)]))
+    ser.write(bytes([USER_INPUT]))
     # print("case = ")
     # print(ser.read_until().rstrip().decode())
     # time.sleep(1)
     ser.write(bytes([res]))
-    # print("res = ")
-    # print(ser.read_until().rstrip().decode())
-    #volt_start = struct.pack('<i', dac_v_in)
+    # volt_start = struct.pack('<i', dac_v_in)
 
     # time.sleep(1)
     # ser.write(volt_start)
-    ser.write(bytearray(str(dac_v_in), 'utf-8'))
+    # ser.write(bytearray(str(dac_v_in), 'utf-8'))
+    ser.write(struct.pack('<i', dac_v_in))
     # ser.write(bytes([int(4)]))
     # print("volt_start = ", volt_start)
 
@@ -195,16 +227,17 @@ def user_res_and_volt(ser, case):
 
     headline = ("v_adc", "v_dac", "current", "dut_res")
     print(headline)
-
+    _ = ser.read_all()
     while True:
         res = get_resistor(ser)
         if res == END_PROGRAM:
             break
-
+        # print(res)
         v_dac = get_adc_voltage(ser)
+        # print(v_dac)
         current = float(v_dac) / res
         v_adc = get_adc_voltage(ser) * ((R1+R2)/R2) # ((47.1 + (10.015 + 6.796)) / (10.015 + 6.796))  # multiply by the V.D of the InAmp
-
+        # print(v_adc)
         dut_res = 0
         if current > 0:
             dut_res = v_adc / current
@@ -225,7 +258,7 @@ if __name__ == '__main__':
     command = 0
     while command != "end":
         command = input("insert '1' for the sweep process,\n'2' for user resistor and voltage\n"
-                        "'3' for user resistor and voltage min and max  or 'end' to end the program: ")
+                        "'3' for user resistor and voltage min and max  or 'end' to end the program: ").rstrip()
         if command == '1':
             sweep(arduino)
 
