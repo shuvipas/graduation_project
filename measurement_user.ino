@@ -2,14 +2,17 @@
 #define ON HIGH
 #define OFF LOW
 #define END_PROGRAM "Done" 
+
 Adafruit_MCP4725 DAC;
 
 const int InAmpVout = A0;
 const int DacVout = A1;
-const int measurement_times = 2;
+const int VRs = A2;
+const int measurement_times = 1;
 const int DAC_res = 4096;
 const long reportInterval = 200; // How often to write the result to serial in milliseconds
 const int READ_DIFF = 100;
+
 const int HANDSHAKE = 0;
 const int SWEEP = 1;
 const int USER_INPUT = 2;
@@ -32,9 +35,11 @@ void measurements(int res){
             time_last_write = currTime;
             int adcVal = analogRead(InAmpVout);
             int dacVal = analogRead(DacVout);
+            int Volt_Rs = analogRead(VRs);
             while(!Serial.availableForWrite()){}
             Serial.println(res); // what resistor is turned on R = 10^i
             Serial.println(dacVal); // the dac val
+            Serial.println(Volt_Rs);
             Serial.println(adcVal);
             meas_num++;
         }
@@ -114,7 +119,6 @@ void setup() {
 }
 
 
-
 void loop() {
     if (Serial.available() > 0) {
         int in_byte = Serial.read(); // user command
@@ -134,28 +138,5 @@ void loop() {
             default:
                 break;
         }
-
-
-/*
-        if (in_byte == HANDSHAKE)
-        {
-            while(!Serial.availableForWrite()){
-            }
-            Serial.println("Lets start!");
-        }
-
-        else if(in_byte == USER_INPUT)
-        {   
-            //Serial.println(in_byte);
-            user_input();
-        }
-
-        else if(in_byte == SWEEP)
-        {
-            sweep();    
-        }
-*/
-
-
     }//if (Serial.available() > 0)
 }//void loop
