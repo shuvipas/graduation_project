@@ -3,9 +3,9 @@
 #define OFF LOW
 
 Adafruit_MCP4725 DAC; 
-const int InAmpVout = A0;
-const int DacVout = A1;
-const int measurement_times = 2;
+const int InAmpVout = A0; // Analog input for measuring voltage across the chip
+const int DacVout = A1; // Analog input for measuring voltage output from the DAC
+const int measurement_times = 2; //Number of voltage measurements to be taken for each voltege
 const int DAC_res = 4096;
 const long reportInterval = 200; // How often to write the result to serial in milliseconds
 
@@ -23,7 +23,7 @@ const int R6 = 6; // 1 M*ohm
 void setup() {
   Serial.begin(115200);
   DAC.begin(0x60); // Default I2C Address of MCP4725 
-  Serial.setTimeout(2);
+  Serial.setTimeout(2); // How meny milliseconds we will wait for input from the pyhon code
   pinMode(R2, OUTPUT);
   pinMode(R3, OUTPUT);
   pinMode(R4, OUTPUT);
@@ -57,7 +57,6 @@ if (Serial.available() > 0) {
       digitalWrite(R6, OFF);
       
       digitalWrite(i, ON);// turn on the specific resistor
-    //  digitalWrite(R4, ON);
       int DAC_value[20] = {200, 400, 600, 800, 1000, 
                            1200, 1400, 1600, 1800, 2000,
                            2200, 2400, 2600, 2800, 3000,
@@ -65,7 +64,7 @@ if (Serial.available() > 0) {
       for(int j = 0; j < 20; j++)
       {  
 
-      DAC.setVoltage(DAC_value[j], false);  //setVoltage(value, storeflag(saves val for later use)) 
+      DAC.setVoltage(DAC_value[j], false);  //false: don't store value for later use
       int measurement = 0;
       unsigned long timeLastWrite = millis();
 
