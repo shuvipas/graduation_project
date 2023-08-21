@@ -124,5 +124,5 @@ if __name__ == '__main__':
         print(i)
     save_file = input("Do you want to save the data? y/n").strip()
     if(save_file == 'y'):
-        file = input("Write the file path and file name(add '.xlsx'):")  #"C:\\Users\\Meir Sokolik\\OneDrive\\Documents\\Engineering Project\\new_rs1Meg.xlsx"
+        file = input("Write the file path and file name(add '.xlsx'):")  #"C:\\Users\\<name>\\<folder location>\\<file name>"
         convert_list_to_excel(data, headline, file)
