@@ -10,6 +10,10 @@ VCC = 5.0
 V_SUPPLY = 18
 START = 1
 
+R1 = 47.1 # The voltege devider of the InAmp
+R2 = 10.015 + 6.796
+
+
 
 def serial_connect(port_name):
     try:
@@ -106,7 +110,7 @@ if __name__ == '__main__':
 
         v_dac = get_adc_voltage(arduino)
         current = v_dac / res
-        v_adc = get_adc_voltage(arduino) * ((47.1 + (10.015 + 6.796)) / (10.015 + 6.796))  #  multiplied with the V.D of the InAmp
+        v_adc = get_adc_voltage(arduino) * ((R1+R2)/R2) #  multiplied with the V.D of the InAmp
 
         dut_res = 0
         if current > 0:
