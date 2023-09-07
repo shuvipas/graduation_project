@@ -19,7 +19,7 @@ R2 = 10.015 + 6.796
 
 def serial_connect(port_name):
     try:
-        ser = serial.Serial(port_name, baudrate=115200, timeout=None) # 2)
+        ser = serial.Serial(port_name, baudrate=115200, timeout=None) 
         print("opened port " + ser.name + '\n')
         # give arduino time to reset
         time.sleep(2)
@@ -109,7 +109,7 @@ def sweep(ser):
             dut_res = v_adc / current
         data.append((v_adc, v_dac, current, dut_res))
 
-        print((v_adc, v_dac, current, dut_res))
+        #print((v_adc, v_dac, current, dut_res))
 
     convert_list_to_excel(data)
 
@@ -194,7 +194,8 @@ def user_res_and_volt(ser, case):
 
         data.append((v_adc, v_dac, current, dut_res))
 
-        print(v_adc, v_dac, current, dut_res)
+        #print(v_adc, v_dac, current, dut_res)
+    convert_list_to_excel(data)
 
 
 if __name__ == '__main__':
