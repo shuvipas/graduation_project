@@ -153,26 +153,9 @@ def user_res_and_volt(ser, case):
 
     dac_v_in = int(DAC_RESOLUTION * (min_volt / VCC))
     ser.write(bytes([USER_INPUT]))
-    # print("case = ")
-    # print(ser.read_until().rstrip().decode())
-    # time.sleep(1)
     ser.write(bytes([res]))
-    # volt_start = struct.pack('<i', dac_v_in)
-
-    # time.sleep(1)
-    # ser.write(volt_start)
-    # ser.write(bytearray(str(dac_v_in), 'utf-8'))
     ser.write(struct.pack('<i', dac_v_in))
-    # ser.write(bytes([int(4)]))
-    # print("volt_start = ", volt_start)
-
-    # print(ser.read_until().rstrip().decode())
-    # time.sleep(1)
     ser.write(bytes([read_num]))
-    # print("read_num = ")
-    # print(ser.read_until().rstrip().decode())
-    # print("i = ")
-    # print(ser.read_until().rstrip().decode())
     data = list()
 
     headline = ("v_adc", "v_dac", "current", "dut_res")
@@ -182,19 +165,14 @@ def user_res_and_volt(ser, case):
         res = get_resistor(ser)
         if res == END_PROGRAM:
             break
-        # print(res)
         v_dac = get_adc_voltage(ser)
-        # print(v_dac)
         current = float(v_dac) / res
-        v_adc = get_adc_voltage(ser) * ((R1+R2)/R2) # ((47.1 + (10.015 + 6.796)) / (10.015 + 6.796))  # multiply by the V.D of the InAmp
-        # print(v_adc)
+        v_adc = get_adc_voltage(ser) * ((R1+R2)/R2)  # multiply by the V.D of the InAmp
         dut_res = 0
         if current > 0:
             dut_res = v_adc / current
-
         data.append((v_adc, v_dac, current, dut_res))
-
-        #print(v_adc, v_dac, current, dut_res)
+        
     convert_list_to_excel(data)
 
 
