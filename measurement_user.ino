@@ -61,33 +61,22 @@ void user_input(){
     int res = Serial.read();
     
     resistors_switching(res);
-    //while(!Serial.availableForWrite()){}
-    //Serial.println(res);
     while (Serial.available() < 4){}
-    //int dac_vin = Serial.readStringUntil('\n').toInt(); //read();
     byte data[4];
     Serial.readBytes(data, 4);  // Read the 4 bytes into the data array
 
     // Convert the byte array back to an integer
     int dac_vin = *((int*)data);
-    //while(!Serial.availableForWrite()){}
-    //Serial.println(DacVIn);
+   
     
     while (!Serial.available()){}
     int read_num = Serial.read();
-    //while(!Serial.availableForWrite()){}
-    //Serial.println(readNum);
-    //digitalWrite(res, ON);
             
     for (int i = 0; i < read_num; i++){
-        //while(!Serial.availableForWrite()){}
-        //Serial.println(i);
         dac_vin += i * READ_DIFF;
         DAC.setVoltage(dac_vin, false);  //setVoltage(value, store flag(saves val for later use))
         measurements(res);    
     } // for(readNum)
-
-    //while(!Serial.availableForWrite()){}
     Serial.println(END_PROGRAM);
 }
 
@@ -117,7 +106,6 @@ void setup() {
     pinMode(R5, OUTPUT);
     pinMode(R6, OUTPUT);
 }
-
 
 void loop() {
     if (Serial.available() > 0) {
