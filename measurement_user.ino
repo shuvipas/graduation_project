@@ -48,7 +48,7 @@ void measurements(int res){
         }
     }
 }
-**
+/**
  * Switch the specified resistor on and turning off the others.
  * @param res_on The resistor to turn on.
  */
