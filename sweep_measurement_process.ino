@@ -36,20 +36,17 @@ if (Serial.available() > 0) {
   int inByte = Serial.read();
   int test = 0;
   if(inByte == CASE_1) {test = 1;}
-  else if (inByte == HANDSHAKE)
-     { 
-      if (Serial.availableForWrite())
-        {
-    Serial.println("Message received.");
-        }
-    test = 0;
+  else if (inByte == HANDSHAKE){ 
+      if (Serial.availableForWrite()){
+          Serial.println("Message received.");
+      }
+  test = 0;
   }
   
   if(test)
   {
   
     for(int i = R2; i <= R6; i++){
-      //int i = 4;
       digitalWrite(R2, OFF);
       digitalWrite(R3, OFF);
       digitalWrite(R4, OFF);
@@ -60,19 +57,15 @@ if (Serial.available() > 0) {
       int DAC_value[20] = {200, 400, 600, 800, 1000, 
                            1200, 1400, 1600, 1800, 2000,
                            2200, 2400, 2600, 2800, 3000,
-                           3200, 3400, 3600, 3800, 4000};  // If it doesn't work we could try diffrent data types like 'uint32_t'     
-      for(int j = 0; j < 20; j++)
-      {  
+                           3200, 3400, 3600, 3800, 4000};   
+      for(int j = 0; j < 20; j++){  
+        DAC.setVoltage(DAC_value[j], false);  //false: don't store value for later use
+        int measurement = 0;
+        unsigned long timeLastWrite = millis();
 
-      DAC.setVoltage(DAC_value[j], false);  //false: don't store value for later use
-      int measurement = 0;
-      unsigned long timeLastWrite = millis();
-
-      while(measurement < measurement_times)
-      {
+        while(measurement < measurement_times){
           unsigned long currTime = millis(); // Grab the current time
-          if(currTime - timeLastWrite >= reportInterval)
-          {
+          if(currTime - timeLastWrite >= reportInterval){
             timeLastWrite = currTime;
             int adcVal = analogRead(InAmpVout);
             int dacVal = analogRead(DacVout);
@@ -81,10 +74,10 @@ if (Serial.available() > 0) {
             Serial.println(adcVal); 
             measurement++;
           }  
-      }
-     } //for(DAC_value) 
-   } //for(R)
-    Serial.println("Done");
-  } //if(test)
- }//if (Serial.available() > 0)
-}//void loop
+        }
+      } 
+    } 
+  Serial.println("Done");
+  } 
+ }
+}
