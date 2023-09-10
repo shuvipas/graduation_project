@@ -36,16 +36,14 @@ if (Serial.available() > 0) {
   int inByte = Serial.read();
   int test = 0;
   if(inByte == CASE_1) {test = 1;}
-  else if (inByte == HANDSHAKE){ 
+  else if (inByte == HANDSHAKE){  // validate communication with python
       if (Serial.availableForWrite()){
           Serial.println("Message received.");
       }
   test = 0;
   }
   
-  if(test)
-  {
-  
+  if(test)  {
     for(int i = R2; i <= R6; i++){
       digitalWrite(R2, OFF);
       digitalWrite(R3, OFF);
