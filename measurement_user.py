@@ -67,16 +67,17 @@ def get_resistor(ser):
 
 
 def convert_list_to_excel(data_list):
-    head_line = ("v_adc", "v_dac", "current", "dut_res")
-    file_name = input("insert file name: ").rstrip()
-    file_path = "C:\\Users\\Meir Sokolik\\OneDrive\\Documents\\Engineering Project\\" + file_name + ".xlsx"
-    workbook = openpyxl.Workbook()
-    sheet = workbook.active
-    sheet.append(head_line)
-    for row_data in data_list:
-        sheet.append(row_data)
+    save_file = input("Do you want to save the data? y/n").strip()
+    if(save_file == 'y'):
+        file = input("Write the file path and file name(add '.xlsx'):")  #Write in this format: "C:\\Users\\<name>\\<folder location>\\<file name>"
+        workbook = openpyxl.Workbook()
+        sheet = workbook.active
+        head_line = ("v_adc", "v_dac", "current", "dut_res")
+        sheet.append(head_line)
+        for row_data in data_list:
+            sheet.append(row_data)
 
-    workbook.save(file_path)
+        workbook.save(file)
 
 
 def reconnect(ser):
@@ -90,7 +91,6 @@ def reconnect(ser):
 
 
 def sweep(ser):
-    # reconnect(ser)
     _ = ser.read_all()
     ser.write(bytes([SWEEP]))
 
@@ -101,16 +101,12 @@ def sweep(ser):
             break
 
         v_dac = get_adc_voltage(ser)
-        # print(res)
         current = v_dac / res
-        v_adc = get_adc_voltage(ser) * ((R1+R2)/R2) # (47.1 + (10.015 + 6.796)) / (10.015 + 6.796))  # multiply by the V.D of the InAmp
+        v_adc = get_adc_voltage(ser) * ((R1+R2)/R2) # Multiply by the V.D of the InAmp
         dut_res = 0
         if current != 0:
             dut_res = v_adc / current
         data.append((v_adc, v_dac, current, dut_res))
-
-        #print((v_adc, v_dac, current, dut_res))
-
     convert_list_to_excel(data)
 
 
@@ -126,13 +122,11 @@ def user_input(case):
     min_volt = float(input("insert voltage (float up to 5): "))
 
     if case == 2:
-        # min_volt = float(input("insert voltage (float up to 5): "))
         while 5 < min_volt or min_volt < 0:
             print("the correct value for the voltage is a float between 0-5")
             min_volt = float(input("insert voltage (float up to 5): "))
 
     elif case == 3:
-        # min_volt = float(input("insert min voltage (float up to 5): "))
         while 5 < min_volt or min_volt < 0:
             print("the correct value for the voltage is a float between 0-5")
             min_volt = float(input("insert voltage (float up to 5): "))
@@ -157,9 +151,6 @@ def user_res_and_volt(ser, case):
     ser.write(struct.pack('<i', dac_v_in))
     ser.write(bytes([read_num]))
     data = list()
-
-    headline = ("v_adc", "v_dac", "current", "dut_res")
-    print(headline)
     _ = ser.read_all()
     while True:
         res = get_resistor(ser)
@@ -180,17 +171,12 @@ if __name__ == '__main__':
     port = 'COM3'
     arduino = serial_connect(port)
     print("start program")
-    # handshake_arduino(arduino)
-    # reconnect(arduino)
-    # Read and discard everything that may be in the input buffer
-    # _ = arduino.read_all()
     command = 0
     while command != "end":
         command = input("insert '1' for the sweep process,\n'2' for user resistor and voltage\n"
                         "'3' for user resistor and voltage min and max  or 'end' to end the program: ").rstrip()
         if command == '1':
             sweep(arduino)
-
         elif command == '2' or command == '3':
             user_res_and_volt(arduino, int(command))
 
