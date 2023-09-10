@@ -79,7 +79,6 @@ def convert_list_to_excel(data_list, head_line, file_name):
     sheet.append(head_line)
     for row_data in data_list:
         sheet.append(row_data)
-
     workbook.save(file_name)
 
 
@@ -88,7 +87,6 @@ if __name__ == '__main__':
     port = 'COM3'
     arduino = serial_connect(port)
     print("start program")
-
     handshake_arduino(arduino)
 
     # Chill out while everything gets set
@@ -107,7 +105,6 @@ if __name__ == '__main__':
         res = get_resistor(arduino)
         if res == "Done":
             break
-
         v_dac = get_adc_voltage(arduino)
         current = v_dac / res
         v_adc = get_adc_voltage(arduino) * ((R1+R2)/R2) #  multiplied with the V.D of the InAmp
@@ -115,14 +112,10 @@ if __name__ == '__main__':
         dut_res = 0
         if current > 0:
             dut_res = v_adc / current
-
-        #  if v_adc + v_dac < V_SUPPLY:
         data.append((v_adc, v_dac, current, dut_res))
 
     arduino.close()
-    for i in data:
-        print(i)
     save_file = input("Do you want to save the data? y/n").strip()
     if(save_file == 'y'):
-        file = input("Write the file path and file name(add '.xlsx'):")  #"C:\\Users\\<name>\\<folder location>\\<file name>"
+        file = input("Write the file path and file name(add '.xlsx'):")  #Write in this format: "C:\\Users\\<name>\\<folder location>\\<file name>"
         convert_list_to_excel(data, headline, file)
