@@ -8,7 +8,7 @@ Adafruit_MCP4725 DAC;
 const int InAmpVout = A0;
 const int DacVout = A1;
 const int VRs = A2;
-const int measurement_times = 1;
+const int measurement_times = 5;
 const int DAC_res = 4096;
 const long reportInterval = 200; // How often to write the result to serial in milliseconds
 const int READ_DIFF = 100;
@@ -24,7 +24,10 @@ const int R5 = 5; // 100 K*ohm
 const int R6 = 6; // 1 M*ohm
 
 
-
+/**
+ * Perform voltage measurements and transmit results to the python script.
+ * @param res The resistor being used for measurements.
+ */
 void measurements(int res){
     int meas_num = 0;
     unsigned long time_last_write = millis();
@@ -38,14 +41,17 @@ void measurements(int res){
             int Volt_Rs = analogRead(VRs);
             while(!Serial.availableForWrite()){}
             Serial.println(res); // what resistor is turned on R = 10^i
-            Serial.println(dacVal); // the dac val
+            Serial.println(dacVal); // the DAC val
             Serial.println(Volt_Rs);
             Serial.println(adcVal);
             meas_num++;
         }
     }
 }
-
+**
+ * Switch the specified resistor on and turning off the others.
+ * @param res_on The resistor to turn on.
+ */
 void resistors_switching(int res_on){
     digitalWrite(R2, OFF);
     digitalWrite(R3, OFF);
@@ -56,31 +62,32 @@ void resistors_switching(int res_on){
     digitalWrite(res_on, ON);// turn on the specific resistor
 }
 
+/**
+ * Handle user input from the python script for resistor selection and DAC voltage values.
+ */
 void user_input(){
     while (!Serial.available()){}
     int res = Serial.read();
-    
     resistors_switching(res);
     while (Serial.available() < 4){}
     byte data[4];
     Serial.readBytes(data, 4);  // Read the 4 bytes into the data array
-
-    // Convert the byte array back to an integer
-    int dac_vin = *((int*)data);
+    int dac_vin = *((int*)data);  // Convert the byte array back to an integer
    
     
     while (!Serial.available()){}
-    int read_num = Serial.read();
-            
+    int read_num = Serial.read();          
     for (int i = 0; i < read_num; i++){
         dac_vin += i * READ_DIFF;
         DAC.setVoltage(dac_vin, false);  //setVoltage(value, store flag(saves val for later use))
         measurements(res);    
-    } // for(readNum)
+    } 
     Serial.println(END_PROGRAM);
 }
 
-
+/**
+ * General sweep across predefined current values.
+ */
 void sweep(){
     for(int i = R2; i <= R6; i++){
         resistors_switching(i);        
@@ -90,8 +97,8 @@ void sweep(){
         for(int j = 0; j < arr_len; j++){
             DAC.setVoltage(DAC_value[j], false);  //setVoltage(value, storeflag(saves val for later use))
             measurements(i);
-        } //for(DAC_value)
-    } //for(R)
+        } 
+    }
     Serial.println(END_PROGRAM);
 }
 
@@ -110,11 +117,10 @@ void setup() {
 void loop() {
     if (Serial.available() > 0) {
         int in_byte = Serial.read(); // user command
-
         switch (in_byte){
-            case HANDSHAKE:
-                while(!Serial.availableForWrite()){
-                }
+            // validate communication with python
+            case HANDSHAKE:   
+                while(!Serial.availableForWrite()){}
                 Serial.println("Lets start!");
                 break;
             case USER_INPUT:
@@ -126,5 +132,5 @@ void loop() {
             default:
                 break;
         }
-    }//if (Serial.available() > 0)
-}//void loop
+     }
+}
