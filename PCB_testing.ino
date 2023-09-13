@@ -23,7 +23,14 @@ void setup(void){
 
 void loop(void){
     for(int i = 2; i <= 6; ++i){
-      digitalWrite(i, HIGH); // The pins D2-D6 are used to switch between the five different resistors.            
+      // The pins D2-D6 are used to switch between the five different resistors.
+      digitalWrite(2, LOW);
+      digitalWrite(3, LOW);
+      digitalWrite(4, LOW);
+      digitalWrite(5, LOW);
+      digitalWrite(6, LOW);
+           
+      digitalWrite(i, HIGH);             
       MCP4725.setVoltage(2048, false); //The integer value range is 0-4095 (2^12).       
       dacOutRead = analogRead(DIG_POT_OUT);
       feedbackVoltRead = analogRead(RET_In);
@@ -43,6 +50,5 @@ void loop(void){
       Serial.print("R = ");
       Serial.println(i);
       delay(1000);
-      digitalWrite(i, LOW);
     }
 }
