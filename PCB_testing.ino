@@ -19,6 +19,11 @@ void setup(void){
   Serial.begin(9600);
   MCP4725.begin(0x60); 
   Serial.println("---Generating different currents---");
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
 }
 
 void loop(void){
@@ -29,7 +34,6 @@ void loop(void){
       digitalWrite(4, LOW);
       digitalWrite(5, LOW);
       digitalWrite(6, LOW);
-      digitalWrite(7, LOW);
            
       digitalWrite(i, HIGH);             
       MCP4725.setVoltage(2048, false); //The integer value range is 0-4095 (2^12).       
