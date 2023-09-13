@@ -29,6 +29,7 @@ void loop(void){
       digitalWrite(4, LOW);
       digitalWrite(5, LOW);
       digitalWrite(6, LOW);
+      digitalWrite(7, LOW);
            
       digitalWrite(i, HIGH);             
       MCP4725.setVoltage(2048, false); //The integer value range is 0-4095 (2^12).       
