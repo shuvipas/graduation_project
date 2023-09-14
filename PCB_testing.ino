@@ -17,27 +17,29 @@ float feedback_volt = 0.0;
 float voltage_out_inA = 0.0;
 float voltage_chip = 0.0;
 
-//depends on the digital pins but the values must be continues 
+
 const int R2 = 2;// 100 ohm
 const int R3 = 3; // 1 K*ohm
 const int R4 = 4; // 10 K*ohm
 const int R5 = 5; // 100 K*ohm
 const int R6 = 6; // 1 M*ohm
 
- //The integer value range is 0-4095 (2^12). 
-const int DAC_volt = 2048; // DAC_volt= 2.5(v)   .DAC(volt) =  4096/5  (4096 <= 12bit, 5(v) from the arduino
+ //The integer value range is 0-4095 (12 bit). 
+const int DAC_volt = 2048; // DAC_volt= 2.5(v). DAC(volt) =  4096/5  (5(v) from the arduino)
 
 
 
 void setup(void){
   Serial.begin(115200);
   MCP4725.begin(0x60); // Default I2C Address of MCP4725
-  Serial.println("---Generating different currents---");
+  Serial.setTimeout(5000); //maximum milliseconds to wait for serial data.
   pinMode(R2, OUTPUT);
   pinMode(R3, OUTPUT);
   pinMode(R4, OUTPUT);
   pinMode(R5, OUTPUT);
   pinMode(R6, OUTPUT);
+
+  Serial.println("---Generating different currents---");
 }
 
 void loop(void){
@@ -58,8 +60,7 @@ void loop(void){
       dac_out = (dac_out_read * V_ref) / ADC_res;
       feedback_volt = (feedback_volt_read * V_ref) / ADC_res;
       voltage_out_inA = (voltage_chip_read * V_ref) / ADC_res;
-      voltage_chip = voltage_out_inA * (1 / (18.0 / (47 + 18))); //Calculating the voltage drop bebore the voltage divider.
-      
+      voltage_chip = voltage_out_inA * (1 / (18.0 / (47.0 + 18.0))); //Calculating the voltage drop bebore the voltage divider.
       
       Serial.println(" ");
       Serial.print("DIG_POT_OUT (DAC output) = ");
