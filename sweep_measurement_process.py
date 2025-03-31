@@ -58,7 +58,7 @@ def handshake_arduino(ser, sleep_time=1, print_handshake_message=True, handshake
 
 def get_adc_voltage(ser):
     adc_num = int(ser.read_until().rstrip().decode())
-    v_adc = (adc_num * VCC) / ADC_RESOLUTION
+    v_adc = (adc_num / ADC_RESOLUTION) * VCC
     return v_adc
 
 
