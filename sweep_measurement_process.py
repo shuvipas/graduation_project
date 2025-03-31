@@ -1,6 +1,5 @@
 import serial
 import time
-import matplotlib.pyplot as plt
 import openpyxl
 
 # DAC_RESOLUTION = 4096
